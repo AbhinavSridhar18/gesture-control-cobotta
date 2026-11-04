@@ -1,0 +1,57 @@
+# Gestensteuerung für den DENSO COBOTTA – Konfiguration
+# Alle einstellbaren Werte stehen hier, damit der Code für einen neuen Aufbau
+# nicht geändert werden muss.
+
+kamera:
+  index: 0              # 0 = eingebaute Webcam des MacBooks
+  spiegeln: true        # Bild spiegeln (natürlicher beim Gestikulieren)
+
+erkennung:
+  backend: mediapipe    # mediapipe = vortrainierter Gesture Recognizer | eigen = eigener Klassifikator
+  modell_pfad: models/gesture_recognizer.task       # MediaPipe-Modell (Hand + Handpunkte, immer benötigt)
+  klassifikator_pfad: models/eigener_klassifikator.joblib   # erzeugt von scripts/training_klassifikator.py
+  min_konfidenz: 0.55   # Gesten unterhalb dieser Konfidenz werden ignoriert (gemessen: Mittelwerte 0,61-0,90 je nach Geste)
+  stopp_konfidenz: 0.45 # niedrigere Schwelle für STOPP: Fehlstopp ist harmlos, verpasster Stopp gefährlich (fail-safe)
+  stabile_frames: 5     # gleiche Geste in N aufeinanderfolgenden Bildern, bevor ein Befehl ausgelöst wird (gemessen ca. 230-270 ms bei 15-17 Bildern/s)
+  stopp_frames: 2       # STOPP reagiert schneller als alle anderen Gesten (gemessen ca. 70 ms)
+  freigabe_frames: 15   # Faust so lange halten (gemessen ca. 0,9 s), um nach einem STOPP freizugeben
+  sperrzeit_s: 0.5      # Pause nach einem Befehl, damit eine Geste = ein Schritt
+  keine_hand_timeout_s: 1.0  # so lange keine Hand sichtbar -> STOPP
+
+# Zuordnung Geste -> Befehl (Gestennamen von MediaPipe)
+gesten:
+  Open_Palm: STOPP
+  Pointing_Up: ACHSE_WECHSELN
+  Thumb_Up: SCHRITT_PLUS
+  Thumb_Down: SCHRITT_MINUS
+  Victory: GREIFER_UMSCHALTEN
+  Closed_Fist: NEUTRAL      # Faust halten = Freigabe nach STOPP
+  ILoveYou: SCHRITTWEITE_UMSCHALTEN   # Grob-/Feinschritt umschalten (wie Tippschrittweite am Teach Pendant)
+
+bewegung:
+  schrittweiten_mm: [5.0, 1.0]  # Grobschritt / Feinschritt; der erste Wert gilt beim Start
+  geschwindigkeit_prozent: 10  # reduzierte Geschwindigkeit am realen Roboter
+  max_schritt_mm: 10.0       # Sicherheitsgrenze: größerer Schritt wird abgelehnt
+  bahnende: "@E"             # DENSO-Bewegungsoption: @E = warten, bis das Ziel erreicht ist (Encoder),
+                             # @0 = bis der Sollwert das Ziel erreicht, @P = Überschleifen (kehrt früher zurück)
+
+# Zulässiger Arbeitsraum des Werkzeugs in Roboter-Basiskoordinaten [mm].
+# PLATZHALTERWERTE – vor dem Einsatz am realen COBOTTA prüfen!
+arbeitsraum:
+  x: [150.0, 300.0]
+  y: [-150.0, 150.0]
+  z: [50.0, 250.0]
+  start: [200.0, 0.0, 150.0]
+
+roboter:
+  backend: mock         # mock | bcap
+  ip: 192.168.0.1       # realer COBOTTA (aus Cobotta_test/Setting.xml); Simulation: IP der Windows-VM
+  port: 5007            # b-CAP-Port
+  provider: CaoProv.DENSO.VRC   # laut DENSO-Python-Beispiel für direkte b-CAP-Verbindung (real und Simulation)
+  timeout_s: 3.0        # Wartezeit auf Antwort der Steuerung
+
+greifer:
+  vorhanden: false      # erst auf true setzen, wenn am COBOTTA ein elektrischer Greifer montiert ist
+  offen_mm: 30.0        # Backenabstand offen
+  geschlossen_mm: 5.0   # Backenabstand geschlossen
+  geschwindigkeit_prozent: 50

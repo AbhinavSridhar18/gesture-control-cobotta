@@ -1,0 +1,24 @@
+# Python-Umgebung und temporäre Dateien
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# wird beim ersten Start automatisch heruntergeladen
+models/*.task
+
+# Protokolle von Testläufen (bei Bedarf einzelne Protokolle gezielt hinzufügen)
+data/protokoll_*.csv
+
+# Hilfsdateien, die nicht ins Repository gehören
+docs/mock_bahn.png
+docs/praesentation/quelle/
+
+# LaTeX-Hilfsdateien
+*.aux
+*.log
+*.out
+*.toc
+
+# aussortierte Datensatz-Aufnahmen (z. B. falsch gezeigte Geste)
+data/datensatz_verworfen/
